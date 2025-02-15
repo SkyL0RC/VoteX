@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import "./Sbt.sol";
+
 contract Voting {
     struct Candidate {
         string name;
@@ -14,7 +16,9 @@ contract Voting {
     uint256 public votingStart;
     uint256 public votingEnd;
 
-constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
+     SBT public sbtContract;
+
+constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _sbtAddress) {
     for (uint256 i = 0; i < _candidateNames.length; i++) {
         candidates.push(Candidate({
             name: _candidateNames[i],
@@ -24,6 +28,8 @@ constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
     owner = msg.sender;
     votingStart = block.timestamp;
     votingEnd = block.timestamp + (_durationInMinutes * 1 minutes);
+
+    sbtContract = SBT(_sbtAddress); // SBT kontratını bağlama
 }
 
     modifier onlyOwner {
@@ -39,15 +45,16 @@ constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
     }
 
     function vote(uint256 _candidateIndex) public {
+        require(block.timestamp >= votingStart && block.timestamp < votingEnd, "Voting is not active.");
         require(!voters[msg.sender], "You have already voted.");
         require(_candidateIndex < candidates.length, "Invalid candidate index.");
-
+        
+        // Kullanıcının SBT'ye sahip olup olmadığını kontrol et
+        require(sbtContract.hasSoul(msg.sender), "You must have an SBT to vote.");
+        
+        // Oy verme işlemi
         candidates[_candidateIndex].voteCount++;
         voters[msg.sender] = true;
-    }
-
-    function getAllVotesOfCandiates() public view returns (Candidate[] memory){
-        return candidates;
     }
 
     function getVotingStatus() public view returns (bool) {
