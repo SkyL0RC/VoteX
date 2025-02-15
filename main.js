@@ -171,7 +171,7 @@ const connectMetamask = async() => {
     const signer = provider.getSigner();
     WALLET_CONNECTED = await signer.getAddress();
     var element = document.getElementById("metamasknotification");
-    element.innerHTML = "Metamask is connected " + WALLET_CONNECTED;
+    element.innerHTML = "Metamask bağlandı " + WALLET_CONNECTED;
 }
 
 const addVote = async() => {
@@ -182,14 +182,14 @@ const addVote = async() => {
         const signer = provider.getSigner();
         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
         var cand = document.getElementById("cand");
-        cand.innerHTML = "Please wait, adding a vote in the smart contract";
+        cand.innerHTML = "Lütfen bekleyin, akıllı sözleşmeye oy ekleniyor";
         const tx = await contractInstance.vote(name.value);
         await tx.wait();
-        cand.innerHTML = "Vote added !!!";
+        cand.innerHTML = "Oy eklendi !!!";
     }
     else {
         var cand = document.getElementById("cand");
-        cand.innerHTML = "Please connect metamask first";
+        cand.innerHTML = "Oy vermeden önce Metamask bağlantınızı yapınız";
     }
 }
 
@@ -204,12 +204,12 @@ const voteStatus = async() => {
         const currentStatus = await contractInstance.getVotingStatus();
         const time = await contractInstance.getRemainingTime();
         console.log(time);
-        status.innerHTML = currentStatus == 1 ? "Voting is currently open" : "Voting is finished";
-        remainingTime.innerHTML = `Remaining time is ${parseInt(time, 16)} seconds`;
+        status.innerHTML = currentStatus == 1 ? "Oylama şu anda açık" : "Oylama bitti";
+        remainingTime.innerHTML = `Kalan süre ${parseInt(time, 16)} saniye`;
     }
     else {
         var status = document.getElementById("status");
-        status.innerHTML = "Please connect metamask first";
+        status.innerHTML = "Önce Metamask bağlantısını yapın ";
     }
 }
 
@@ -220,7 +220,7 @@ const getAllCandidates = async() => {
         await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
-        p3.innerHTML = "Please wait, getting all the candidates from the voting smart contract";
+        p3.innerHTML = "Lütfen bekleyin, oylama akıllı sözleşmesinden tüm adaylar alınıyor";
         var candidates = await contractInstance.getAllVotesOfCandiates();
         console.log(candidates);
         var table = document.getElementById("myTable");
@@ -236,10 +236,10 @@ const getAllCandidates = async() => {
             statusCell.innerHTML = candidates[i].voteCount;
         }
 
-        p3.innerHTML = "The tasks are updated"
+        p3.innerHTML = "Görevler güncellendi"
     }
     else {
         var p3 = document.getElementById("p3");
-        p3.innerHTML = "Please connect metamask first";
+        p3.innerHTML = "Lütfen önce metamask'ı bağlayın";
     }
 }
